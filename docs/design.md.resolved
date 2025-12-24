@@ -1,0 +1,124 @@
+# YouShop System Design
+
+## 1. Domain Entities (Class Diagram)
+
+This diagram represents the core data structures and their relationships, designed for the Modular Monolith.
+
+```mermaid
+classDiagram
+    %% Identity Domain
+    class User {
+        +UUID id
+        +String email
+        +String passwordHash
+        +Role role
+        +DateTime createdAt
+    }
+    class Role {
+        <<enumeration>>
+        ADMIN
+        CLIENT
+    }
+    User -- Role
+
+    %% Display Domain
+    class Product {
+        +UUID id
+        +String sku
+        +String name
+        +String description
+        +Decimal price
+        +UUID categoryId
+        +Boolean isActive
+    }
+    class Category {
+        +UUID id
+        +String name
+    }
+    Product *-- Category
+
+    %% Storage Domain
+    class Inventory {
+        +UUID id
+        +String sku
+        +Int physicalStock
+        +Int reservedStock
+        +Int availableStock()
+    }
+    %% Loose coupling via SKU
+    Product .. Inventory : share SKU
+
+    %% Workflow Domain
+    class Order {
+        +UUID id
+        +UUID userId
+        +Decimal totalPrice
+        +OrderStatus status
+        +DateTime createdAt
+    }
+    class OrderItem {
+        +UUID id
+        +UUID orderId
+        +String productSku
+        +Int quantity
+        +Decimal unitPrice
+    }
+    class OrderStatus {
+        <<enumeration>>
+        PENDING
+        PAID
+        CANCELLED
+        DELIVERED
+    }
+
+    Order "1" *-- "*" OrderItem
+    Order -- OrderStatus
+    User "1" -- "*" Order
+```
+
+## 2. Use Cases (Actors & Actions)
+
+### Actor: Visitor (Non-Authenticated)
+*   **Consult Catalog**: View paginated list of products.
+*   **Search**: Filter by category and price range.
+*   **View Details**: See full description of a specific product.
+
+### Actor: Client (Authenticated)
+*   **Authentication**: Sign up (Secure hash) & Login (JWT).
+*   **Place Order**: 
+    1.  Validate cart.
+    2.  Check stock availability.
+    3.  Confirm Price (Tax Inc).
+    4.  Create Order (Status: PENDING).
+*   **View History**: List personal orders with status.
+
+### Actor: Admin (Authenticated + Role)
+*   **Manage Catalog**: CRUD Products (Add, Edit, Hide).
+*   **Manage Inventory**: Manual stock adjustment (e.g., after supply arrival).
+*   **Monitor Stock**: View list of low-stock items.
+
+---
+
+## 3. Technical Patterns (Per Requirements)
+
+### Generic API Responses
+All endpoints will return a standardized format using TypeScript Generics:
+```typescript
+interface ApiResponse<T> {
+  statusCode: number;
+  message: string;
+  data: T;
+  timestamp: string;
+}
+```
+
+### Advanced Validation Pipes
+*   **Class-Validator**: Decorators (`@IsEmail`, `@Min(0)`) on DTOs.
+*   **Transformation**: `class-transformer` to convert plain JSON to typed objects automatically.
+
+### Interceptors (Caching)
+*   **CachingInterceptor**: Applied to `GET /products` to reduce DB load for the public catalog.
+
+### Guards (Security)
+*   **JwtAuthGuard**: Verifies the token signature.
+*   **RolesGuard**: Checks `user.role` against `@Roles(Role.ADMIN)`.

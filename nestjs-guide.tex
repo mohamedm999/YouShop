@@ -1,0 +1,310 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage[margin=2.5cm]{geometry}
+
+% Code styling
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\title{\textbf{NestJS Essential Guide}\\From Zero to CRUD}
+\author{YouShop Project}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Installation \& Project Setup}
+
+\subsection{Step 1: Install NestJS CLI}
+\begin{lstlisting}[language=bash]
+npm install -g @nestjs/cli
+\end{lstlisting}
+
+\subsection{Step 2: Create a New Project}
+\begin{lstlisting}[language=bash]
+nest new my-app
+cd my-app
+\end{lstlisting}
+
+\subsection{Step 3: Install Validation Packages}
+\begin{lstlisting}[language=bash]
+npm install class-validator class-transformer
+\end{lstlisting}
+
+\subsection{Step 4: Configure Global Validation}
+Edit \texttt{src/main.ts}:
+\begin{lstlisting}[language=Java]
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,           // Strip unknown properties
+    forbidNonWhitelisted: true, // Error on unknown properties
+    transform: true,           // Auto-convert types
+  }));
+  
+  await app.listen(3000);
+}
+bootstrap();
+\end{lstlisting}
+
+\section{Core Concepts}
+
+\subsection{The Module (The Organizer)}
+Groups related code together. Every app has at least one: \texttt{AppModule}.
+
+\begin{lstlisting}[language=Java]
+// src/app.module.ts
+@Module({
+  imports: [ProductsModule],      // Other modules to use
+  controllers: [AppController],   // Request handlers
+  providers: [AppService],        // Business logic
+})
+export class AppModule {}
+\end{lstlisting}
+
+\subsection{The Controller (The Waiter)}
+Handles HTTP requests and returns responses. Does NOT contain business logic.
+
+\begin{lstlisting}[language=Java]
+@Controller('products')          // Base route: /products
+export class ProductsController {
+  @Get()        // GET /products
+  @Post()       // POST /products
+  @Get(':id')   // GET /products/123
+  @Patch(':id') // PATCH /products/123
+  @Delete(':id')// DELETE /products/123
+}
+\end{lstlisting}
+
+\subsection{The Service (The Chef)}
+Contains all business logic. Called by Controllers.
+
+\begin{lstlisting}[language=Java]
+@Injectable()
+export class ProductsService {
+  create(data) { /* DB logic here */ }
+  findAll() { /* DB logic here */ }
+}
+\end{lstlisting}
+
+\subsection{The DTO (The Contract)}
+Defines and validates the shape of incoming data.
+
+\begin{lstlisting}[language=Java]
+export class CreateProductDto {
+  @IsString()
+  name: string;
+
+  @IsNumber()
+  @Min(0)
+  price: number;
+}
+\end{lstlisting}
+
+\section{Build a Products CRUD}
+
+\subsection{Step 1: Generate the Module}
+\begin{lstlisting}[language=bash]
+nest generate module products
+nest generate controller products
+nest generate service products
+\end{lstlisting}
+
+\subsection{Step 2: Create the DTO}
+Create \texttt{src/products/dto/create-product.dto.ts}:
+\begin{lstlisting}[language=Java]
+import { IsString, IsNumber, Min, IsOptional } from 'class-validator';
+
+export class CreateProductDto {
+  @IsString()
+  name: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsNumber()
+  @Min(0)
+  price: number;
+}
+\end{lstlisting}
+
+Create \texttt{src/products/dto/update-product.dto.ts}:
+\begin{lstlisting}[language=Java]
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateProductDto } from './create-product.dto';
+
+// Makes all fields optional
+export class UpdateProductDto extends PartialType(CreateProductDto) {}
+\end{lstlisting}
+
+\textbf{Note:} Install \texttt{@nestjs/mapped-types} for \texttt{PartialType}:
+\begin{lstlisting}[language=bash]
+npm install @nestjs/mapped-types
+\end{lstlisting}
+
+\subsection{Step 3: Implement the Service}
+Edit \texttt{src/products/products.service.ts}:
+\begin{lstlisting}[language=Java]
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+
+@Injectable()
+export class ProductsService {
+  private products = []; // In-memory storage
+  private idCounter = 1;
+
+  create(dto: CreateProductDto) {
+    const product = { id: this.idCounter++, ...dto };
+    this.products.push(product);
+    return product;
+  }
+
+  findAll() {
+    return this.products;
+  }
+
+  findOne(id: number) {
+    const product = this.products.find(p => p.id === id);
+    if (!product) throw new NotFoundException(`Product #${id} not found`);
+    return product;
+  }
+
+  update(id: number, dto: UpdateProductDto) {
+    const product = this.findOne(id);
+    Object.assign(product, dto);
+    return product;
+  }
+
+  remove(id: number) {
+    const index = this.products.findIndex(p => p.id === id);
+    if (index === -1) throw new NotFoundException(`Product #${id} not found`);
+    return this.products.splice(index, 1)[0];
+  }
+}
+\end{lstlisting}
+
+\subsection{Step 4: Implement the Controller}
+Edit \texttt{src/products/products.controller.ts}:
+\begin{lstlisting}[language=Java]
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { ProductsService } from './products.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+
+@Controller('products')
+export class ProductsController {
+  constructor(private readonly productsService: ProductsService) {}
+
+  @Post()
+  create(@Body() createProductDto: CreateProductDto) {
+    return this.productsService.create(createProductDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.productsService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateProductDto: UpdateProductDto) {
+    return this.productsService.update(id, updateProductDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.remove(id);
+  }
+}
+\end{lstlisting}
+
+\subsection{Step 5: Run \& Test}
+\begin{lstlisting}[language=bash]
+npm run start:dev
+\end{lstlisting}
+
+\textbf{Test with cURL:}
+\begin{lstlisting}[language=bash]
+# Create
+curl -X POST http://localhost:3000/products \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Laptop","price":999}'
+
+# Read All
+curl http://localhost:3000/products
+
+# Read One
+curl http://localhost:3000/products/1
+
+# Update
+curl -X PATCH http://localhost:3000/products/1 \
+  -H "Content-Type: application/json" \
+  -d '{"price":899}'
+
+# Delete
+curl -X DELETE http://localhost:3000/products/1
+\end{lstlisting}
+
+\section{Quick Reference: Common Decorators}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Decorator} & \textbf{Purpose} \\
+\midrule
+\texttt{@IsString()} & Must be a string \\
+\texttt{@IsNumber()} & Must be a number \\
+\texttt{@IsEmail()} & Must be a valid email \\
+\texttt{@IsNotEmpty()} & Cannot be empty \\
+\texttt{@IsOptional()} & Field is optional \\
+\texttt{@MinLength(n)} & Min string length \\
+\texttt{@Min(n)} / \texttt{@Max(n)} & Min/Max number value \\
+\texttt{@IsEnum(Enum)} & Must be from an enum \\
+\texttt{@Type(() => Number)} & Transform to Number (class-transformer) \\
+\bottomrule
+\end{tabular}
+\caption{Common class-validator Decorators}
+\end{table}
+
+\end{document}
