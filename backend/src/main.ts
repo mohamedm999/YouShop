@@ -5,12 +5,25 @@ import helmet from 'helmet';
 import { winstonLogger } from './common/config/winston.config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+
+import cookieParser from 'cookie-parser';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: winstonLogger,
   });
 
+  app.use(cookieParser());
   app.use(helmet());
+  
+  app.enableCors({
+    origin: 'http://localhost:3000', // Frontend URL
+    credentials: true,
+  });
+
+  // Register Global Exception Filter
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({

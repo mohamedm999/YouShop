@@ -1,0 +1,49 @@
+# Task List (Based on [docs/jira_plan.csv](file:///c:/laragon/www/YouShop-monorepo/docs/jira_plan.csv))
+
+## E01: Foundations & Architecture ✅ COMMITTED
+- [x] [Env] Initialize NestJS Monorepo <!-- id: 1 -->
+    - [x] Create module folders (Auth, Catalog, Inventory, Orders) <!-- id: 2 -->
+    - [x] Configure Environment Variables ([.env](file:///c:/laragon/www/YouShop-monorepo/backend/src/modules/orders/.env), `ConfigModule`) <!-- id: 3 -->
+- [x] [Env] Docker Compose Setup (PostgreSQL + PgAdmin) <!-- id: 4 -->
+- [x] [Global Tools] Winston Logging <!-- id: 4a -->
+- [x] [Global Tools] Helmet Security <!-- id: 4b -->
+- [x] [Global Tools] class-validator & class-transformer <!-- id: 4c -->
+- [x] [Technical] Generic ApiResponse<T> Interface <!-- id: 4d -->
+- [x] [Docs] Swagger/OpenAPI at /api/docs <!-- id: 4e -->
+- [ ] [DB] Prisma Init <!-- id: 5 -->
+    - [ ] Initialize Prisma Schema <!-- id: 6 -->
+    - [ ] Configure datasource to PostgreSQL <!-- id: 7 -->
+    - [ ] Run initial migration <!-- id: 8 -->
+- [ ] [DevOps] GitHub Actions Pipeline <!-- id: 9 -->
+
+## E02: Identity Domain (Auth)
+- [ ] [Auth] User Registration <!-- id: 10 -->
+    - [ ] [Auth] Implement User Entity (Prisma) <!-- id: 11 -->
+    - [ ] [Auth] Bcrypt Service <!-- id: 12 -->
+- [ ] [Auth] User Login <!-- id: 13 -->
+    - [ ] [Auth] JWT Strategy (Passport, Guards) <!-- id: 14 -->
+
+## E03: Display Domain (Catalog)
+- [ ] [Catalog] Browse Products <!-- id: 15 -->
+- [ ] [Catalog] Search & Filter <!-- id: 16 -->
+- [ ] [Catalog] Product Seeder <!-- id: 17 -->
+- [ ] [Catalog] Pagination Pipe <!-- id: 18 -->
+- [ ] [Catalog] Caching Interceptor <!-- id: 19 -->
+
+## E04: Storage Domain (Inventory)
+- [ ] [Inventory] Admin Stock Update <!-- id: 20 -->
+- [ ] [Inventory] Low Stock Alert <!-- id: 21 -->
+- [ ] [Inventory] Reserve Logic <!-- id: 22 -->
+
+## E05: Workflow Domain (Orders)
+- [ ] [Orders] Place Order <!-- id: 23 -->
+    - [ ] [Orders] Price Calculator Service <!-- id: 24 -->
+    - [ ] [Orders] Transactional Creation (ACID) <!-- id: 25 -->
+- [ ] [Orders] Order History <!-- id: 26 -->
+
+## E06: Bonus - Microservices Transition
+- [ ] [Micro] RabbitMQ Setup <!-- id: 27 -->
+- [ ] [Micro] Extract Orders App <!-- id: 28 -->
+- [ ] [Micro] Extract Inventory App <!-- id: 29 -->
+- [ ] [Micro] Shared Library <!-- id: 30 -->
+- [ ] [Micro] Event Patterns <!-- id: 31 -->

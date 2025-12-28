@@ -1,0 +1,48 @@
+// ============================================
+// INVENTORY MODULE - Prisma Schema
+// ============================================
+// Database: inventory-db (port 5435)
+// Owner: Stock, Warehouse entities
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// INVENTORY DOMAIN MODELS
+// ============================================
+
+model Stock {
+  id          String   @id @default(uuid())
+  sku         String   // Reference to Catalog's product (NOT a FK!)
+  quantity    Int      @default(0)
+  reservedQty Int      @default(0) @map("reserved_qty")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  warehouseId String    @map("warehouse_id")
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+
+  @@unique([sku, warehouseId])
+  @@map("stocks")
+}
+
+model Warehouse {
+  id        String   @id @default(uuid())
+  name      String
+  location  String?
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  stocks Stock[]
+
+  @@map("warehouses")
+}
