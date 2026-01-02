@@ -1,0 +1,55 @@
+// ============================================
+// ORDERS MODULE - Prisma Schema
+// ============================================
+// Database: orders-db (port 5436)
+// Owner: Order, OrderItem entities
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ORDERS DOMAIN MODELS
+// ============================================
+
+model Order {
+  id           String      @id @default(uuid())
+  userId       String      @map("user_id") // Reference to Auth's user (NOT a FK!)
+  status       OrderStatus @default(PENDING)
+  totalAmount  Decimal     @map("total_amount") @db.Decimal(10, 2)
+  shippingAddr String?     @map("shipping_address")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  items OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String  @map("order_id")
+  sku       String // Reference to Catalog's product (NOT a FK!)
+  quantity  Int
+  unitPrice Decimal @map("unit_price") @db.Decimal(10, 2)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}

@@ -55,6 +55,9 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<ApiResponse<AuthResponseDto>> {
     const refreshToken = (req as Request & { cookies: Record<string, string> }).cookies['refresh_token'];
+    
+    console.log('Refresh request cookies:', (req as Request & { cookies: any }).cookies);
+    console.log('Refresh request headers:', req.headers);
 
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token');
@@ -75,7 +78,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = (req as Request & { cookies: Record<string, string> }).cookies['refresh_token'];
 
@@ -86,5 +89,7 @@ export class AuthController {
     res.clearCookie('refresh_token', {
       path: '/auth/refresh',
     });
+
+    return apiResponse(null, 'Logout successful');
   }
 }

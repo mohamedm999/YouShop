@@ -17,7 +17,10 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prisma:generate:all": "prisma generate --schema src/modules/auth/prisma/schema.prisma && prisma generate --schema src/modules/catalog/prisma/schema.prisma && prisma generate --schema src/modules/inventory/prisma/schema.prisma && prisma generate --schema src/modules/orders/prisma/schema.prisma",
+    "prisma:migrate:auth": "prisma migrate dev --schema src/modules/auth/prisma/schema.prisma",
+    "prisma:migrate:catalog": "prisma migrate dev --schema src/modules/catalog/prisma/schema.prisma"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
