@@ -6,15 +6,8 @@ export class CatalogPrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  constructor() {
-    super({
-      datasources: {
-        db: {
-          url: process.env.CATALOG_DATABASE_URL,
-        },
-      },
-    });
-  }
+  // Removed constructor with datasource override as it's now handled by the schema and generated client configuration
+
 
   async onModuleInit() {
     await this.$connect();

@@ -17,18 +17,21 @@ import { AuthService } from '../services/auth.service';
 import { SignupDto } from '../dto/signup.dto';
 import { LoginDto } from '../dto/login.dto';
 import { AuthResponseDto } from '../dto/auth-response.dto';
+import { Public } from '../../../common/decorators/public.decorator';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('signup')
   async signup(@Body() signupDto: SignupDto): Promise<ApiResponse<AuthResponseDto>> {
     const data = await this.authService.signup(signupDto);
     return apiResponse(data, 'User registered successfully');
   }
 
+  @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -48,6 +51,7 @@ export class AuthController {
     return apiResponse({ accessToken, user }, 'Login successful');
   }
 
+  @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(
@@ -76,7 +80,8 @@ export class AuthController {
 
     return apiResponse({ accessToken, user }, 'Token refreshed');
   }
-
+   
+  @Public()
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {

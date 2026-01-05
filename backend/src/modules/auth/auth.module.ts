@@ -1,24 +1,27 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import * as dotenv from 'dotenv';
+import { ConfigService } from '@nestjs/config';
 import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 import { AuthPrismaService } from './prisma/auth-prisma.service';
-
-// Load Auth module specific environment variables
-dotenv.config({ path: 'src/modules/auth/.env' });
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'fallback_secret',
-      signOptions: { expiresIn: '1h' },
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { 
+          expiresIn: (configService.get<string>('JWT_EXPIRES_IN') || '1h') as any
+        },
+      }),
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthPrismaService],
-  exports: [AuthService], // Export if other modules need to guard routes
+  providers: [AuthService, AuthPrismaService, JwtStrategy],
+  exports: [AuthService, JwtModule, PassportModule],
 })
 export class AuthModule {}

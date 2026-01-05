@@ -8,17 +8,8 @@ export class AuthPrismaService
 {
   private readonly logger = new Logger(AuthPrismaService.name);
 
-  constructor() {
-    const url = process.env.AUTH_DATABASE_URL;
-    console.log('!!! DEBUG: AUTH_DATABASE_URL value is:', url);
-    super({
-      datasources: {
-        db: {
-          url,
-        },
-      },
-    });
-  }
+  // Removed constructor with datasource override as it's now handled by the schema and generated client configuration
+
 
   async onModuleInit() {
     this.logger.log(`Initializing with AUTH_DATABASE_URL: ${process.env.AUTH_DATABASE_URL}`);

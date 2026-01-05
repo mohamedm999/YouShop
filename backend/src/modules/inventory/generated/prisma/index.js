@@ -172,17 +172,16 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": "DATABASE_URL",
+        "fromEnvVar": "INVENTORY_DATABASE_URL",
         "value": null
       }
     }
   },
-  "inlineSchema": "// ============================================\n// INVENTORY MODULE - Prisma Schema\n// ============================================\n// Database: inventory-db (port 5435)\n// Owner: Stock, Warehouse entities\n// ============================================\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\n// ============================================\n// INVENTORY DOMAIN MODELS\n// ============================================\n\nmodel Stock {\n  id          String   @id @default(uuid())\n  sku         String // Reference to Catalog's product (NOT a FK!)\n  quantity    Int      @default(0)\n  reservedQty Int      @default(0) @map(\"reserved_qty\")\n  createdAt   DateTime @default(now()) @map(\"created_at\")\n  updatedAt   DateTime @updatedAt @map(\"updated_at\")\n\n  warehouseId String    @map(\"warehouse_id\")\n  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])\n\n  @@unique([sku, warehouseId])\n  @@map(\"stocks\")\n}\n\nmodel Warehouse {\n  id        String   @id @default(uuid())\n  name      String\n  location  String?\n  isActive  Boolean  @default(true) @map(\"is_active\")\n  createdAt DateTime @default(now()) @map(\"created_at\")\n  updatedAt DateTime @updatedAt @map(\"updated_at\")\n\n  stocks Stock[]\n\n  @@map(\"warehouses\")\n}\n",
-  "inlineSchemaHash": "0d51a45676a6d143c881e471a248a8b688e4704f27117f1e560a66be7f6dff08",
+  "inlineSchema": "// ============================================\n// INVENTORY MODULE - Prisma Schema\n// ============================================\n// Database: inventory-db (port 5435)\n// Owner: Stock, Warehouse entities\n// ============================================\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"INVENTORY_DATABASE_URL\")\n}\n\n// ============================================\n// INVENTORY DOMAIN MODELS\n// ============================================\n\nmodel Stock {\n  id          String   @id @default(uuid())\n  sku         String // Reference to Catalog's product (NOT a FK!)\n  quantity    Int      @default(0)\n  reservedQty Int      @default(0) @map(\"reserved_qty\")\n  createdAt   DateTime @default(now()) @map(\"created_at\")\n  updatedAt   DateTime @updatedAt @map(\"updated_at\")\n\n  warehouseId String    @map(\"warehouse_id\")\n  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])\n\n  @@unique([sku, warehouseId])\n  @@map(\"stocks\")\n}\n\nmodel Warehouse {\n  id        String   @id @default(uuid())\n  name      String\n  location  String?\n  isActive  Boolean  @default(true) @map(\"is_active\")\n  createdAt DateTime @default(now()) @map(\"created_at\")\n  updatedAt DateTime @updatedAt @map(\"updated_at\")\n\n  stocks Stock[]\n\n  @@map(\"warehouses\")\n}\n",
+  "inlineSchemaHash": "0f99f8ec6c20e54ba29ea19353f96b9de60c7545db2ed8f059f04c3c4b095b81",
   "copyEngine": true
 }
 

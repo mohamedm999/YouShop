@@ -173,16 +173,17 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": "DATABASE_URL",
+        "fromEnvVar": "CATALOG_DATABASE_URL",
         "value": null
       }
     }
   },
-  "inlineSchema": "// ============================================\n// CATALOG MODULE - Prisma Schema\n// ============================================\n// Database: catalog-db (port 5434)\n// Owner: Product, Category entities\n// ============================================\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\n// ============================================\n// CATALOG DOMAIN MODELS\n// ============================================\n\nmodel Product {\n  id          String   @id @default(uuid())\n  sku         String   @unique // Business key for cross-service reference\n  name        String\n  description String?\n  price       Decimal  @db.Decimal(10, 2)\n  imageUrl    String?  @map(\"image_url\")\n  isActive    Boolean  @default(true) @map(\"is_active\")\n  createdAt   DateTime @default(now()) @map(\"created_at\")\n  updatedAt   DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations within Catalog domain only\n  categoryId String?   @map(\"category_id\")\n  category   Category? @relation(fields: [categoryId], references: [id])\n\n  @@map(\"products\")\n}\n\nmodel Category {\n  id          String   @id @default(uuid())\n  name        String   @unique\n  description String?\n  createdAt   DateTime @default(now()) @map(\"created_at\")\n  updatedAt   DateTime @updatedAt @map(\"updated_at\")\n\n  products Product[]\n\n  @@map(\"categories\")\n}\n",
-  "inlineSchemaHash": "61245f54e150a9d94ea69562901aa7115f8eb8d0ed1152a7f78c1f3bed23a8b0",
+  "inlineSchema": "// ============================================\n// CATALOG MODULE - Prisma Schema\n// ============================================\n// Database: catalog-db (port 5434)\n// Owner: Product, Category entities\n// ============================================\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"CATALOG_DATABASE_URL\")\n}\n\n// ============================================\n// CATALOG DOMAIN MODELS\n// ============================================\n\nmodel Product {\n  id          String   @id @default(uuid())\n  sku         String   @unique // Business key for cross-service reference\n  name        String\n  description String?\n  price       Decimal  @db.Decimal(10, 2)\n  imageUrl    String?  @map(\"image_url\")\n  isActive    Boolean  @default(true) @map(\"is_active\")\n  createdAt   DateTime @default(now()) @map(\"created_at\")\n  updatedAt   DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations within Catalog domain only\n  categoryId String?   @map(\"category_id\")\n  category   Category? @relation(fields: [categoryId], references: [id])\n\n  @@map(\"products\")\n}\n\nmodel Category {\n  id          String   @id @default(uuid())\n  name        String   @unique\n  description String?\n  createdAt   DateTime @default(now()) @map(\"created_at\")\n  updatedAt   DateTime @updatedAt @map(\"updated_at\")\n\n  products Product[]\n\n  @@map(\"categories\")\n}\n",
+  "inlineSchemaHash": "f6ab55f4358c2102af633643b52e18e70a0540ee3d483c15ad2a313dbdb64e7e",
   "copyEngine": true
 }
 config.dirname = '/'
@@ -201,7 +202,7 @@ config.compilerWasm = undefined
 
 config.injectableEdgeEnv = () => ({
   parsed: {
-    DATABASE_URL: typeof globalThis !== 'undefined' && globalThis['DATABASE_URL'] || typeof process !== 'undefined' && process.env && process.env.DATABASE_URL || undefined
+    CATALOG_DATABASE_URL: typeof globalThis !== 'undefined' && globalThis['CATALOG_DATABASE_URL'] || typeof process !== 'undefined' && process.env && process.env.CATALOG_DATABASE_URL || undefined
   }
 })
 

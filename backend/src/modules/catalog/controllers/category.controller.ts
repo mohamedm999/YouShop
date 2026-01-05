@@ -19,6 +19,9 @@ import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { apiResponse } from '../../../common/helpers/api-response.helper';
 import type { ApiResponse } from '../../../common/interfaces/api-response.interface';
 import { CategoryEntity } from '../entities/category.entity';
+import { Public } from '../../../common/decorators/public.decorator';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { Role } from '../../auth/generated/prisma';
 
 @ApiTags('Catalog - Categories')
 @Controller('catalog/categories')
@@ -27,12 +30,14 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Create a new category' })
   async create(@Body() createCategoryDto: CreateCategoryDto): Promise<ApiResponse<CategoryEntity>> {
     const data = await this.categoryService.create(createCategoryDto);
     return apiResponse(data, 'Category created successfully');
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get all categories' })
   async findAll(): Promise<ApiResponse<CategoryEntity[]>> {
@@ -40,6 +45,7 @@ export class CategoryController {
     return apiResponse(data, 'Categories retrieved successfully');
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get category by ID' })
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse<CategoryEntity>> {
@@ -48,6 +54,7 @@ export class CategoryController {
   }
 
   @Patch(':id')
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Update a category' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -58,6 +65,7 @@ export class CategoryController {
   }
 
   @Delete(':id')
+  @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a category' })
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse<null>> {

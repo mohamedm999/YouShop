@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { AuthPrismaService } from '../prisma/auth-prisma.service';
 import { SignupDto } from '../dto/signup.dto';
 import { LoginDto } from '../dto/login.dto';
@@ -74,6 +75,8 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
+  // ... (refresh/logout skipped for brevity)
+
   async refresh(refreshToken: string): Promise<LoginResponse> {
     // 1. Check if token exists in DB
     const storedToken = await this.prisma.refreshToken.findUnique({
@@ -107,7 +110,14 @@ export class AuthService {
 
 
   private async generateTokens(user: User): Promise<LoginResponse> {
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    // Add unique JTI to ensure token uniqueness even if generated in same second
+    const payload = { 
+      sub: user.id, 
+      email: user.email, 
+      role: user.role,
+      jti: crypto.randomUUID() 
+    };
+    
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' }); 
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' }); 
 
@@ -115,7 +125,7 @@ export class AuthService {
     await this.prisma.refreshToken.create({
       data: {
         token: refreshToken,
-        userId: user.id, // Ensure your schema maps this correctly (usually 'userId' or via 'user' relation)
+        userId: user.id, 
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       },
     });

@@ -178,17 +178,16 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": "DATABASE_URL",
+        "fromEnvVar": "ORDERS_DATABASE_URL",
         "value": null
       }
     }
   },
-  "inlineSchema": "// ============================================\n// ORDERS MODULE - Prisma Schema\n// ============================================\n// Database: orders-db (port 5436)\n// Owner: Order, OrderItem entities\n// ============================================\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\n// ============================================\n// ORDERS DOMAIN MODELS\n// ============================================\n\nmodel Order {\n  id           String      @id @default(uuid())\n  userId       String      @map(\"user_id\") // Reference to Auth's user (NOT a FK!)\n  status       OrderStatus @default(PENDING)\n  totalAmount  Decimal     @map(\"total_amount\") @db.Decimal(10, 2)\n  shippingAddr String?     @map(\"shipping_address\")\n  createdAt    DateTime    @default(now()) @map(\"created_at\")\n  updatedAt    DateTime    @updatedAt @map(\"updated_at\")\n\n  items OrderItem[]\n\n  @@map(\"orders\")\n}\n\nmodel OrderItem {\n  id        String  @id @default(uuid())\n  orderId   String  @map(\"order_id\")\n  sku       String // Reference to Catalog's product (NOT a FK!)\n  quantity  Int\n  unitPrice Decimal @map(\"unit_price\") @db.Decimal(10, 2)\n\n  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)\n\n  @@map(\"order_items\")\n}\n\nenum OrderStatus {\n  PENDING\n  CONFIRMED\n  PROCESSING\n  SHIPPED\n  DELIVERED\n  CANCELLED\n}\n",
-  "inlineSchemaHash": "c4d4b7db6580f2585de42f22814f8f117b3c95157a376c175a7595bd42b8829f",
+  "inlineSchema": "// ============================================\n// ORDERS MODULE - Prisma Schema\n// ============================================\n// Database: orders-db (port 5436)\n// Owner: Order, OrderItem entities\n// ============================================\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"ORDERS_DATABASE_URL\")\n}\n\n// ============================================\n// ORDERS DOMAIN MODELS\n// ============================================\n\nmodel Order {\n  id           String      @id @default(uuid())\n  userId       String      @map(\"user_id\") // Reference to Auth's user (NOT a FK!)\n  status       OrderStatus @default(PENDING)\n  totalAmount  Decimal     @map(\"total_amount\") @db.Decimal(10, 2)\n  shippingAddr String?     @map(\"shipping_address\")\n  createdAt    DateTime    @default(now()) @map(\"created_at\")\n  updatedAt    DateTime    @updatedAt @map(\"updated_at\")\n\n  items OrderItem[]\n\n  @@map(\"orders\")\n}\n\nmodel OrderItem {\n  id        String  @id @default(uuid())\n  orderId   String  @map(\"order_id\")\n  sku       String // Reference to Catalog's product (NOT a FK!)\n  quantity  Int\n  unitPrice Decimal @map(\"unit_price\") @db.Decimal(10, 2)\n\n  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)\n\n  @@map(\"order_items\")\n}\n\nenum OrderStatus {\n  PENDING\n  CONFIRMED\n  PROCESSING\n  SHIPPED\n  DELIVERED\n  CANCELLED\n}\n",
+  "inlineSchemaHash": "5368be1aaf28f106310a15bbfa5d748e309b4b6fad9fb24047f26d7dd6583294",
   "copyEngine": true
 }
 

@@ -25,6 +25,7 @@ export class CreateProductDto {
 
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
+  @IsNotEmpty()
   @Type(() => Number)
   price!: number;
 

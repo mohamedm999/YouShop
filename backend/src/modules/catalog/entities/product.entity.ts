@@ -1,11 +1,15 @@
 import { Decimal } from '@prisma/client/runtime/library';
+import { Transform } from 'class-transformer';
 
 export class ProductEntity {
   id!: string;
   sku!: string;
   name!: string;
   description!: string | null;
-  price!: Decimal;
+
+  @Transform(({ value }) => (value ? Number(value) : null))
+  price!: number; // Changed from Decimal to number for API response
+
   imageUrl!: string | null;
   isActive!: boolean;
   categoryId!: string | null;

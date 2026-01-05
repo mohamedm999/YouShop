@@ -179,13 +179,13 @@ const config = {
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": "DATABASE_URL",
+        "fromEnvVar": "AUTH_DATABASE_URL",
         "value": null
       }
     }
   },
-  "inlineSchema": "// Auth Domain - Prisma Schema\n// This schema is ONLY for the Auth service/module\n// Each domain has its own schema.prisma → its own database\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\n// ============================================\n// AUTH DOMAIN MODELS\n// ============================================\n\nmodel User {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  password  String\n  firstName String?  @map(\"first_name\")\n  lastName  String?  @map(\"last_name\")\n  role      Role     @default(CUSTOMER)\n  isActive  Boolean  @default(true) @map(\"is_active\")\n  createdAt DateTime @default(now()) @map(\"created_at\")\n  updatedAt DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations within Auth domain only\n  refreshTokens RefreshToken[]\n\n  @@map(\"users\")\n}\n\nmodel RefreshToken {\n  id        String   @id @default(uuid())\n  token     String   @unique\n  userId    String   @map(\"user_id\")\n  expiresAt DateTime @map(\"expires_at\")\n  createdAt DateTime @default(now()) @map(\"created_at\")\n\n  // Relation to User (same domain - OK to use FK)\n  user User @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@map(\"refresh_tokens\")\n}\n\nenum Role {\n  CUSTOMER\n  SELLER\n  ADMIN\n}\n",
-  "inlineSchemaHash": "ea14a8ccb74f9fd9c3f91994fd145f7ab96840ad726cdded2787512655136706",
+  "inlineSchema": "// Auth Domain - Prisma Schema\n// This schema is ONLY for the Auth service/module\n// Each domain has its own schema.prisma → its own database\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"AUTH_DATABASE_URL\")\n}\n\n// ============================================\n// AUTH DOMAIN MODELS\n// ============================================\n\nmodel User {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  password  String\n  firstName String?  @map(\"first_name\")\n  lastName  String?  @map(\"last_name\")\n  role      Role     @default(CUSTOMER)\n  isActive  Boolean  @default(true) @map(\"is_active\")\n  createdAt DateTime @default(now()) @map(\"created_at\")\n  updatedAt DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations within Auth domain only\n  refreshTokens RefreshToken[]\n\n  @@map(\"users\")\n}\n\nmodel RefreshToken {\n  id        String   @id @default(uuid())\n  token     String   @unique\n  userId    String   @map(\"user_id\")\n  expiresAt DateTime @map(\"expires_at\")\n  createdAt DateTime @default(now()) @map(\"created_at\")\n\n  // Relation to User (same domain - OK to use FK)\n  user User @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@map(\"refresh_tokens\")\n}\n\nenum Role {\n  CUSTOMER\n  SELLER\n  ADMIN\n}\n",
+  "inlineSchemaHash": "4218b8b109f2bc083de67562f4320a4083437de6923db7e817cf5c21e8d1e2c9",
   "copyEngine": true
 }
 config.dirname = '/'
@@ -204,7 +204,7 @@ config.compilerWasm = undefined
 
 config.injectableEdgeEnv = () => ({
   parsed: {
-    DATABASE_URL: typeof globalThis !== 'undefined' && globalThis['DATABASE_URL'] || typeof process !== 'undefined' && process.env && process.env.DATABASE_URL || undefined
+    AUTH_DATABASE_URL: typeof globalThis !== 'undefined' && globalThis['AUTH_DATABASE_URL'] || typeof process !== 'undefined' && process.env && process.env.AUTH_DATABASE_URL || undefined
   }
 })
 

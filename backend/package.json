@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:generate:all": "prisma generate --schema src/modules/auth/prisma/schema.prisma && prisma generate --schema src/modules/catalog/prisma/schema.prisma && prisma generate --schema src/modules/inventory/prisma/schema.prisma && prisma generate --schema src/modules/orders/prisma/schema.prisma",
     "prisma:migrate:auth": "prisma migrate dev --schema src/modules/auth/prisma/schema.prisma",
-    "prisma:migrate:catalog": "prisma migrate dev --schema src/modules/catalog/prisma/schema.prisma"
+    "prisma:migrate:catalog": "prisma migrate dev --schema src/modules/catalog/prisma/schema.prisma",
+    "prisma:seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -30,9 +31,10 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.3",
-    "@prisma/client": "^6.19.1",
+    "@prisma/client": "6.19.1",
     "@types/bcrypt": "^6.0.0",
     "@types/passport-jwt": "^4.0.1",
+    "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
@@ -41,6 +43,7 @@
     "nest-winston": "^1.10.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "prisma": "6.19.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "winston": "^3.19.0"
@@ -54,8 +57,9 @@
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.10.7",
+    "@types/node": "^22.19.3",
     "@types/supertest": "^6.0.2",
+    "dotenv": "^17.2.3",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
@@ -68,7 +72,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.20.0"
   },
   "jest": {
