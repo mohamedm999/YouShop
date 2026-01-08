@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 
@@ -17,6 +18,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     }),
     AuthModule,
     CatalogModule,
+    InventoryModule,
   ],
   controllers: [AppController],
   providers: [

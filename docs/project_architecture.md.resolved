@@ -1,0 +1,90 @@
+# YouShop Project Architecture
+
+## Overview
+YouShop-monorepo is a **Modular Monolith** built with **NestJS**. It is structured to simulate a microservices architecture within a single repository, preparing for easy future extraction of services if needed.
+
+## Key Architectural Patterns
+
+1.  **Modular Isolation**:
+    *   The application is divided into distinct functional domains (Modules): [Auth](file:///c:/laragon/www/YouShop-monorepo/backend/src/modules/auth/services/auth.service.ts#18-140), `Catalog`, [Inventory](file:///c:/laragon/www/YouShop-monorepo/backend/src/modules/inventory/inventory.module.ts#8-14), `Orders`.
+    *   Each module is self-contained with its own Controllers, Services, and Data Access Layer.
+
+2.  **Database Isolation (Database-per-Module)**:
+    *   This is a critical feature. Each module possesses its own **Prisma Schema** ([schema.prisma](file:///c:/laragon/www/YouShop-monorepo/backend/src/modules/auth/prisma/schema.prisma)) and connects to a separate logical database (or isolated schema).
+    *   **Auth Module**: Uses `auth-db` (User, RefreshToken, Role).
+    *   **Catalog Module**: Uses `catalog-db` (Product, Category).
+    *   **Inventory Module**: Uses `inventory-db` (Stock, Warehouse).
+    *   **Orders Module**: Uses `orders-db` (Order, OrderItem).
+    *   Each module generates its own **Prisma Client** into a dedicated `generated/prisma` directory to avoid type conflicts and ensure strict boundary enforcement.
+
+3.  **Cross-Module Communication**:
+    *   Since direct database joins are impossible (different DBs), modules communicate via public APIs or internal services using "Business Keys" (e.g., `sku` in Inventory refers to `sku` in Catalog, not a database foreign key).
+    *   *Note: Current observation shows synchronous service calls. Future evolution might include Event-Driven Architecture (RabbitMQ/Kafka) for looser coupling.*
+
+## Module Breakdown
+
+### 1. Auth Module
+*   **Responsibility**: User identity, authentication (JWT), and authorization (RBAC).
+*   **Key Entities**: `User`, `RefreshToken`.
+*   **Database**: `AUTH_DATABASE_URL`
+
+### 2. Catalog Module
+*   **Responsibility**: Product management and categorization.
+*   **Key Entities**: `Product`, `Category`.
+*   **Database**: `CATALOG_DATABASE_URL`
+
+### 3. Inventory Module
+*   **Responsibility**: Stock tracking and warehouse management.
+*   **Key Entities**: [Stock](file:///c:/laragon/www/YouShop-monorepo/backend/src/modules/inventory/services/stock.service.ts#25-54), [Warehouse](file:///c:/laragon/www/YouShop-monorepo/backend/src/modules/inventory/entities/warehouse.entity.ts#3-14).
+*   **Database**: `INVENTORY_DATABASE_URL`
+
+### 4. Orders Module
+*   **Responsibility**: Order placement and processing.
+*   **Key Entities**: `Order`, `OrderItem`.
+*   **Database**: `ORDERS_DATABASE_URL`
+
+### Interaction Flow (Event-Driven Architecture)
+The systems communicates asynchronously via a **Message Broker** (e.g., RabbitMQ or Kafka) to ensure loose coupling and high availability.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Orders
+    participant Broker
+    participant Inventory
+    participant Catalog
+    
+    Client->>Orders: Place Order
+    Orders->>Orders: Create "Pending" Order
+    Orders->>Broker: Publish "OrderCreated" Event
+    Orders-->>Client: Return 202 Accepted
+    
+    par Inventory Processing
+        Broker->>Inventory: Consume "OrderCreated"
+        Inventory->>Inventory: Check & Reserve Stock
+        alt Success
+            Inventory->>Broker: Publish "StockReserved"
+        else Failure
+            Inventory->>Broker: Publish "StockReservationFailed"
+        end
+    and Catalog validation (Optional)
+        Broker->>Catalog: Consume "OrderCreated"
+        Catalog->>Catalog: Update Recommendations / Insights
+    end
+
+    Broker->>Orders: Consume "StockReserved"
+    Orders->>Orders: Update Order Status -> "Confirmed"
+```
+
+### Dependency Map (Async)
+| Producer | Consumer | Event / Message | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Orders** | **Inventory** | `order.created` | Trigger stock reservation |
+| **Inventory** | **Orders** | `stock.reserved` | Confirm order fulfillment |
+| **Inventory** | **Orders** | `stock.failed` | Cancel order due to OOS |
+
+## Technology Stack
+*   **Framework**: NestJS (Node.js)
+*   **Language**: TypeScript
+*   **ORM**: Prisma (Multiple Clients)
+*   **Database**: PostgreSQL

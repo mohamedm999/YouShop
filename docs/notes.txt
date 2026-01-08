@@ -1,0 +1,11 @@
+NEXT LEVEL (OPTIONAL)
+
+If you want to go even more senior:
+
+Outbox pattern
+
+Saga pattern
+
+Inventory events
+
+Payment webhooks handling
