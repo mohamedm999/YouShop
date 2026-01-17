@@ -2,7 +2,8 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:4000';
 const SKU = 'TEST-SKU-' + Date.now(); // Unique SKU
-let ACCESS_TOKEN = '';
+let ADMIN_ACCESS_TOKEN = '';
+let USER_ACCESS_TOKEN = '';
 let WAREHOUSE_ID = '';
 
 async function runTests() {
@@ -20,15 +21,37 @@ async function runTests() {
         password: password,
       });
       console.log('✅ Admin Logged In');
-      ACCESS_TOKEN = authRes.data.data.accessToken; 
+      ADMIN_ACCESS_TOKEN = authRes.data.data.accessToken; 
     } catch (e: any) {
       console.error('❌ Login Failed:', e.response?.data || e.message);
-      console.log('Attempting cleanup re-seed might be needed if user does not exist.');
       return;
     }
+
+    // 1b. Auth: Signup/Login as User (for negative testing)
+    const userEmail = 'inventory_user@example.com';
+    console.log(`\n1️⃣b Logging in as User: ${userEmail}`);
+    try {
+        const userRes = await axios.post(`${API_URL}/auth/login`, {
+            email: userEmail,
+            password: password
+        });
+        USER_ACCESS_TOKEN = userRes.data.data.accessToken;
+    } catch(e) {
+        // Register if not exists
+        await axios.post(`${API_URL}/auth/signup`, {
+            email: userEmail,
+            password: password,
+            firstName: 'Inventory',
+            lastName: 'User'
+        });
+        const userRes = await axios.post(`${API_URL}/auth/login`, {
+            email: userEmail,
+            password: password
+        });
+        USER_ACCESS_TOKEN = userRes.data.data.accessToken;
+    }
+    console.log('✅ User Logged In');
     
-    // Note: If Signup makes a Customer, and we need Admin for Warehouse, we might be blocked.
-    // I will check seed.ts content in the next step. If there is a seed admin, I will change this to Login.
 
     // 2. Create Warehouse
     console.log('\n2️⃣  Creating Warehouse...');
@@ -40,13 +63,12 @@ async function runTests() {
             location: 'Test City',
             isActive: true
         },
-        { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+        { headers: { Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}` } }
         );
         WAREHOUSE_ID = whRes.data.data.id;
         console.log(`✅ Warehouse Created: ${WAREHOUSE_ID}`);
     } catch (e: any) {
         console.error('❌ Create Warehouse Failed:', e.response?.data || e.message);
-        // If 403 Forbidden, it means our user is not Admin.
         if (e.response?.status === 403) {
             console.error('⚠️ User is not Admin. Cannot create warehouse.');
             return;
@@ -55,19 +77,36 @@ async function runTests() {
 
     if (!WAREHOUSE_ID) return;
 
-    // 3. Add Stock
-    console.log(`\n3️⃣  Adding Stock (10 items) for SKU: ${SKU}`);
+    // 3. Add Stock (Admin)
+    console.log(`\n3️⃣  Adding Stock (10 items) as Admin for SKU: ${SKU}`);
     await axios.post(
       `${API_URL}/inventory/stocks/${SKU}/${WAREHOUSE_ID}/add`,
       { quantity: 10 },
-      { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+      { headers: { Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}` } }
     );
-    console.log('✅ Stock Added');
+    console.log('✅ Stock Added (Admin)');
+
+    // 3b. Add Stock (User) - Should Fail
+    console.log(`\n3️⃣b Try Adding Stock (10 items) as User...`);
+    try {
+        await axios.post(
+            `${API_URL}/inventory/stocks/${SKU}/${WAREHOUSE_ID}/add`,
+            { quantity: 10 },
+            { headers: { Authorization: `Bearer ${USER_ACCESS_TOKEN}` } }
+        );
+        throw new Error('User was able to add stock! Security FAIL!');
+    } catch (e: any) {
+        if (e.response && e.response.status === 403) {
+            console.log('✅ Access Denied (Expected 403)');
+        } else {
+            console.error('❌ Unexpected error or success:', e.message);
+        }
+    }
 
     // 4. Verify Stock
     console.log('\n4️⃣  Verifying Stock Level...');
     const getRes1 = await axios.get(`${API_URL}/inventory/stocks/${SKU}`, {
-        headers: { Authorization: `Bearer ${ACCESS_TOKEN}` }
+        headers: { Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}` }
     });
     const stock1 = getRes1.data.data.find((s: any) => s.warehouseId === WAREHOUSE_ID);
     console.log(`   Expected: 10, Actual: ${stock1.quantity}`);
@@ -79,13 +118,13 @@ async function runTests() {
     await axios.post(
       `${API_URL}/inventory/stocks/${SKU}/${WAREHOUSE_ID}/reserve`,
       { quantity: 3 },
-      { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+      { headers: { Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}` } }
     );
     console.log('✅ Stock Reserved');
 
     // 6. Verify Reservation
     const getRes2 = await axios.get(`${API_URL}/inventory/stocks/${SKU}`, {
-        headers: { Authorization: `Bearer ${ACCESS_TOKEN}` }
+        headers: { Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}` }
     });
     const stock2 = getRes2.data.data.find((s: any) => s.warehouseId === WAREHOUSE_ID);
     console.log(`   Reserved Expected: 3, Actual: ${stock2.reservedQty}`);
@@ -97,13 +136,13 @@ async function runTests() {
     await axios.post(
       `${API_URL}/inventory/stocks/${SKU}/${WAREHOUSE_ID}/confirm`,
       { quantity: 2 },
-      { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+      { headers: { Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}` } }
     );
     console.log('✅ Stock Confirmed');
 
     // 8. Verify Confirmation
     const getRes3 = await axios.get(`${API_URL}/inventory/stocks/${SKU}`, {
-        headers: { Authorization: `Bearer ${ACCESS_TOKEN}` }
+        headers: { Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}` }
     });
     const stock3 = getRes3.data.data.find((s: any) => s.warehouseId === WAREHOUSE_ID);
     // Started at 10. Reserved 3. Confirmed 2.
@@ -120,13 +159,13 @@ async function runTests() {
     await axios.post(
       `${API_URL}/inventory/stocks/${SKU}/${WAREHOUSE_ID}/release`,
       { quantity: 1 },
-      { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+      { headers: { Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}` } }
     );
     console.log('✅ Stock Released');
 
     // 10. Final Verification
     const getRes4 = await axios.get(`${API_URL}/inventory/stocks/${SKU}`, {
-        headers: { Authorization: `Bearer ${ACCESS_TOKEN}` }
+        headers: { Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}` }
     });
     const stock4 = getRes4.data.data.find((s: any) => s.warehouseId === WAREHOUSE_ID);
     // Reserved: 1 - 1 = 0.

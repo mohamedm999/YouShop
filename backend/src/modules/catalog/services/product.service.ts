@@ -35,17 +35,6 @@ export class ProductService {
       }
     }
 
-    // Validate categoryId if provided
-    if (createProductDto.categoryId) {
-      const category = await this.prisma.category.findUnique({
-        where: { id: createProductDto.categoryId },
-      });
-
-      if (!category) {
-        throw new BadRequestException(`Category with ID "${createProductDto.categoryId}" not found`);
-      }
-    }
-
     const product = await this.prisma.product.create({
       data: createProductDto,
     });
