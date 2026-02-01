@@ -21,7 +21,9 @@ export class ProductService {
     });
 
     if (existingSku) {
-      throw new ConflictException(`Product with SKU "${createProductDto.sku}" already exists`);
+      throw new ConflictException(
+        `Product with SKU "${createProductDto.sku}" already exists`,
+      );
     }
 
     // Validate categoryId if provided
@@ -31,7 +33,9 @@ export class ProductService {
       });
 
       if (!category) {
-        throw new BadRequestException(`Category with ID "${createProductDto.categoryId}" not found`);
+        throw new BadRequestException(
+          `Category with ID "${createProductDto.categoryId}" not found`,
+        );
       }
     }
 
@@ -64,7 +68,10 @@ export class ProductService {
     return plainToInstance(ProductEntity, product);
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto): Promise<ProductEntity> {
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<ProductEntity> {
     // Check if product exists
     await this.findOne(id);
 
@@ -78,7 +85,9 @@ export class ProductService {
       });
 
       if (existingSku) {
-        throw new ConflictException(`Product with SKU "${updateProductDto.sku}" already exists`);
+        throw new ConflictException(
+          `Product with SKU "${updateProductDto.sku}" already exists`,
+        );
       }
     }
 
@@ -89,7 +98,9 @@ export class ProductService {
       });
 
       if (!category) {
-        throw new BadRequestException(`Category with ID "${updateProductDto.categoryId}" not found`);
+        throw new BadRequestException(
+          `Category with ID "${updateProductDto.categoryId}" not found`,
+        );
       }
     }
 

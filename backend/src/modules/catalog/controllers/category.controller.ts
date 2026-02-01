@@ -32,7 +32,9 @@ export class CategoryController {
   @Post()
   @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Create a new category' })
-  async create(@Body() createCategoryDto: CreateCategoryDto): Promise<ApiResponse<CategoryEntity>> {
+  async create(
+    @Body() createCategoryDto: CreateCategoryDto,
+  ): Promise<ApiResponse<CategoryEntity>> {
     const data = await this.categoryService.create(createCategoryDto);
     return apiResponse(data, 'Category created successfully');
   }
@@ -48,7 +50,9 @@ export class CategoryController {
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get category by ID' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse<CategoryEntity>> {
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ApiResponse<CategoryEntity>> {
     const data = await this.categoryService.findOne(id);
     return apiResponse(data, 'Category retrieved successfully');
   }
@@ -68,7 +72,9 @@ export class CategoryController {
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a category' })
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse<null>> {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ApiResponse<null>> {
     await this.categoryService.remove(id);
     return apiResponse(null, 'Category deleted successfully');
   }

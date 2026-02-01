@@ -136,7 +136,8 @@ exports.Prisma.OrderItemScalarFieldEnum = {
   orderId: 'orderId',
   sku: 'sku',
   quantity: 'quantity',
-  unitPrice: 'unitPrice'
+  unitPrice: 'unitPrice',
+  warehouseId: 'warehouseId'
 };
 
 exports.Prisma.SortOrder = {

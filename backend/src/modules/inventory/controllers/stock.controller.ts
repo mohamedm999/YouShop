@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Param,
-  UseGuards,
   UseInterceptors,
   ClassSerializerInterceptor,
   ParseUUIDPipe,
@@ -81,7 +80,11 @@ export class StockController {
     @Param('warehouseId', ParseUUIDPipe) warehouseId: string,
     @Body() dto: ConfirmStockDto,
   ): Promise<ApiResponse<StockEntity>> {
-    const data = await this.stockService.confirmStock(sku, warehouseId, dto.quantity);
+    const data = await this.stockService.confirmStock(
+      sku,
+      warehouseId,
+      dto.quantity,
+    );
     return apiResponse(data, 'Stock confirmed successfully');
   }
 }

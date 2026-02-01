@@ -29,8 +29,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
         exceptionResponse !== null
       ) {
         // Safe type assertion for standard NestJS exception response
-        const resp = exceptionResponse as { message?: string | string[]; errors?: unknown };
-        
+        const resp = exceptionResponse as {
+          message?: string | string[];
+          errors?: unknown;
+        };
+
         // Handle array of messages (e.g. from ValidationPipe)
         if (Array.isArray(resp.message)) {
           message = 'Validation Error';
@@ -42,8 +45,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       }
     }
 
-    response.status(status).json(
-      apiError(message, errors),
-    );
+    if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
+      console.error('HttpExceptionFilter caught:', exception);
+    }
+
+    response.status(status).json(apiError(message, errors));
   }
 }

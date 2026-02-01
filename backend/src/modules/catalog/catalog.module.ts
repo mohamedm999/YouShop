@@ -12,4 +12,3 @@ import { ProductService } from './services/product.service';
   exports: [CategoryService, ProductService],
 })
 export class CatalogModule {}
-

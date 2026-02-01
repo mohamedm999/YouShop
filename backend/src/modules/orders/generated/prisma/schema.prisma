@@ -34,11 +34,12 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(uuid())
-  orderId   String  @map("order_id")
-  sku       String // Reference to Catalog's product (NOT a FK!)
-  quantity  Int
-  unitPrice Decimal @map("unit_price") @db.Decimal(10, 2)
+  id          String  @id @default(uuid())
+  orderId     String  @map("order_id")
+  sku         String // Reference to Catalog's product (NOT a FK!)
+  quantity    Int
+  unitPrice   Decimal @map("unit_price") @db.Decimal(10, 2)
+  warehouseId String  @default("WH-001") @map("warehouse_id")
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 

@@ -11,7 +11,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET') || 'fallback_secret_to_prevent_startup_crash',
+      secretOrKey:
+        configService.get<string>('JWT_SECRET') ||
+        'fallback_secret_to_prevent_startup_crash',
     });
   }
 
@@ -21,11 +23,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!payload) {
       throw new UnauthorizedException();
     }
-    
-    return { 
-      userId: payload.sub, 
-      email: payload.email, 
-      role: payload.role 
+
+    return {
+      userId: payload.sub,
+      email: payload.email,
+      role: payload.role,
     };
   }
 }

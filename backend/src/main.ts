@@ -4,6 +4,8 @@ import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { winstonLogger } from './common/config/winston.config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
 
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
@@ -16,7 +18,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.use(helmet());
-  
+
   app.enableCors({
     origin: 'http://localhost:4000', // Frontend URL
     credentials: true,
@@ -43,6 +45,22 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(process.env.PORT || 4000);
+  const configService = app.get(ConfigService);
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [configService.get('RABBITMQ_URL')],
+      queue: 'inventory_queue',
+      queueOptions: {
+        durable: true,
+      },
+    },
+  });
+
+  await app.startAllMicroservices();
+  const port = process.env.PORT || 4000;
+  await app.listen(port);
+  console.log(`🚀 Application is running on: http://localhost:${port}`);
+  console.log(`📚 API Documentation available at: http://localhost:${port}/api/docs`);
 }
 bootstrap();

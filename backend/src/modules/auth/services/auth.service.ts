@@ -108,24 +108,23 @@ export class AuthService {
     });
   }
 
-
   private async generateTokens(user: User): Promise<LoginResponse> {
     // Add unique JTI to ensure token uniqueness even if generated in same second
-    const payload = { 
-      sub: user.id, 
-      email: user.email, 
+    const payload = {
+      sub: user.id,
+      email: user.email,
       role: user.role,
-      jti: crypto.randomUUID() 
+      jti: crypto.randomUUID(),
     };
-    
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' }); 
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' }); 
+
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
     // Store in DB
     await this.prisma.refreshToken.create({
       data: {
         token: refreshToken,
-        userId: user.id, 
+        userId: user.id,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       },
     });

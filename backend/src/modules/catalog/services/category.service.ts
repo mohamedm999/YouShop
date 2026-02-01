@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { CatalogPrismaService } from '../prisma/catalog-prisma.service';
 import { CreateCategoryDto } from '../dto/create-category.dto';
@@ -16,7 +20,9 @@ export class CategoryService {
     });
 
     if (existing) {
-      throw new ConflictException(`Category "${createCategoryDto.name}" already exists`);
+      throw new ConflictException(
+        `Category "${createCategoryDto.name}" already exists`,
+      );
     }
 
     const category = await this.prisma.category.create({
@@ -46,7 +52,10 @@ export class CategoryService {
     return plainToInstance(CategoryEntity, category);
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<CategoryEntity> {
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<CategoryEntity> {
     // Check if category exists
     await this.findOne(id);
 
@@ -60,7 +69,9 @@ export class CategoryService {
       });
 
       if (existing) {
-        throw new ConflictException(`Category "${updateCategoryDto.name}" already exists`);
+        throw new ConflictException(
+          `Category "${updateCategoryDto.name}" already exists`,
+        );
       }
     }
 

@@ -35,6 +35,20 @@ services:
     ports:
       - "5436:5432"
 
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: youshop
+      RABBITMQ_DEFAULT_PASS: youshop_pass
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   pgadmin:
     image: dpage/pgadmin4
     environment:
@@ -47,3 +61,4 @@ services:
       - catalog_db
       - inventory_db
       - orders_db
+      - rabbitmq

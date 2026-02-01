@@ -5,8 +5,14 @@ import { WarehouseService } from './services/warehouse.service';
 import { StockController } from './controllers/stock.controller';
 import { WarehouseController } from './controllers/warehouse.controller';
 
+import { InventoryEventsController } from './controllers/inventory-events.controller';
+
 @Module({
-  controllers: [StockController, WarehouseController],
+  controllers: [
+    StockController,
+    WarehouseController,
+    InventoryEventsController,
+  ],
   providers: [StockService, WarehouseService, InventoryPrismaService],
   exports: [StockService],
 })

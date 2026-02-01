@@ -32,7 +32,9 @@ export class ProductController {
   @Post()
   @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Create a new product' })
-  async create(@Body() createProductDto: CreateProductDto): Promise<ApiResponse<ProductEntity>> {
+  async create(
+    @Body() createProductDto: CreateProductDto,
+  ): Promise<ApiResponse<ProductEntity>> {
     const data = await this.productService.create(createProductDto);
     return apiResponse(data, 'Product created successfully');
   }
@@ -48,7 +50,9 @@ export class ProductController {
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse<ProductEntity>> {
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ApiResponse<ProductEntity>> {
     const data = await this.productService.findOne(id);
     return apiResponse(data, 'Product retrieved successfully');
   }
@@ -68,7 +72,9 @@ export class ProductController {
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a product' })
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse<null>> {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ApiResponse<null>> {
     await this.productService.remove(id);
     return apiResponse(null, 'Product deleted successfully');
   }

@@ -108,7 +108,8 @@ exports.Prisma.OrderItemScalarFieldEnum = {
   orderId: 'orderId',
   sku: 'sku',
   quantity: 'quantity',
-  unitPrice: 'unitPrice'
+  unitPrice: 'unitPrice',
+  warehouseId: 'warehouseId'
 };
 
 exports.Prisma.SortOrder = {
@@ -177,6 +178,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -185,13 +187,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// ============================================\n// ORDERS MODULE - Prisma Schema\n// ============================================\n// Database: orders-db (port 5436)\n// Owner: Order, OrderItem entities\n// ============================================\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"ORDERS_DATABASE_URL\")\n}\n\n// ============================================\n// ORDERS DOMAIN MODELS\n// ============================================\n\nmodel Order {\n  id           String      @id @default(uuid())\n  userId       String      @map(\"user_id\") // Reference to Auth's user (NOT a FK!)\n  status       OrderStatus @default(PENDING)\n  totalAmount  Decimal     @map(\"total_amount\") @db.Decimal(10, 2)\n  shippingAddr String?     @map(\"shipping_address\")\n  createdAt    DateTime    @default(now()) @map(\"created_at\")\n  updatedAt    DateTime    @updatedAt @map(\"updated_at\")\n\n  items OrderItem[]\n\n  @@map(\"orders\")\n}\n\nmodel OrderItem {\n  id        String  @id @default(uuid())\n  orderId   String  @map(\"order_id\")\n  sku       String // Reference to Catalog's product (NOT a FK!)\n  quantity  Int\n  unitPrice Decimal @map(\"unit_price\") @db.Decimal(10, 2)\n\n  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)\n\n  @@map(\"order_items\")\n}\n\nenum OrderStatus {\n  PENDING\n  CONFIRMED\n  PROCESSING\n  SHIPPED\n  DELIVERED\n  CANCELLED\n}\n",
-  "inlineSchemaHash": "5368be1aaf28f106310a15bbfa5d748e309b4b6fad9fb24047f26d7dd6583294",
+  "inlineSchema": "// ============================================\n// ORDERS MODULE - Prisma Schema\n// ============================================\n// Database: orders-db (port 5436)\n// Owner: Order, OrderItem entities\n// ============================================\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"ORDERS_DATABASE_URL\")\n}\n\n// ============================================\n// ORDERS DOMAIN MODELS\n// ============================================\n\nmodel Order {\n  id           String      @id @default(uuid())\n  userId       String      @map(\"user_id\") // Reference to Auth's user (NOT a FK!)\n  status       OrderStatus @default(PENDING)\n  totalAmount  Decimal     @map(\"total_amount\") @db.Decimal(10, 2)\n  shippingAddr String?     @map(\"shipping_address\")\n  createdAt    DateTime    @default(now()) @map(\"created_at\")\n  updatedAt    DateTime    @updatedAt @map(\"updated_at\")\n\n  items OrderItem[]\n\n  @@map(\"orders\")\n}\n\nmodel OrderItem {\n  id          String  @id @default(uuid())\n  orderId     String  @map(\"order_id\")\n  sku         String // Reference to Catalog's product (NOT a FK!)\n  quantity    Int\n  unitPrice   Decimal @map(\"unit_price\") @db.Decimal(10, 2)\n  warehouseId String  @default(\"WH-001\") @map(\"warehouse_id\")\n\n  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)\n\n  @@map(\"order_items\")\n}\n\nenum OrderStatus {\n  PENDING\n  CONFIRMED\n  PROCESSING\n  SHIPPED\n  DELIVERED\n  CANCELLED\n}\n",
+  "inlineSchemaHash": "0df69d2c4f6624fc3c8414480365a620bfc7bacb969eb771a63652e43318fda1",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Order\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"user_id\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"OrderStatus\"},{\"name\":\"totalAmount\",\"kind\":\"scalar\",\"type\":\"Decimal\",\"dbName\":\"total_amount\"},{\"name\":\"shippingAddr\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"shipping_address\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"items\",\"kind\":\"object\",\"type\":\"OrderItem\",\"relationName\":\"OrderToOrderItem\"}],\"dbName\":\"orders\"},\"OrderItem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"orderId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"order_id\"},{\"name\":\"sku\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"quantity\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"unitPrice\",\"kind\":\"scalar\",\"type\":\"Decimal\",\"dbName\":\"unit_price\"},{\"name\":\"order\",\"kind\":\"object\",\"type\":\"Order\",\"relationName\":\"OrderToOrderItem\"}],\"dbName\":\"order_items\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Order\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"user_id\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"OrderStatus\"},{\"name\":\"totalAmount\",\"kind\":\"scalar\",\"type\":\"Decimal\",\"dbName\":\"total_amount\"},{\"name\":\"shippingAddr\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"shipping_address\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"items\",\"kind\":\"object\",\"type\":\"OrderItem\",\"relationName\":\"OrderToOrderItem\"}],\"dbName\":\"orders\"},\"OrderItem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"orderId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"order_id\"},{\"name\":\"sku\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"quantity\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"unitPrice\",\"kind\":\"scalar\",\"type\":\"Decimal\",\"dbName\":\"unit_price\"},{\"name\":\"warehouseId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"warehouse_id\"},{\"name\":\"order\",\"kind\":\"object\",\"type\":\"Order\",\"relationName\":\"OrderToOrderItem\"}],\"dbName\":\"order_items\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

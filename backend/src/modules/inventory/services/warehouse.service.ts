@@ -11,9 +11,7 @@ import { WarehouseEntity } from '../entities/warehouse.entity';
 
 @Injectable()
 export class WarehouseService {
-  constructor(
-    private readonly prisma: InventoryPrismaService,
-  ) {}
+  constructor(private readonly prisma: InventoryPrismaService) {}
 
   // ===============================
   // CREATE
@@ -48,9 +46,7 @@ export class WarehouseService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return warehouses.map((w) =>
-      plainToInstance(WarehouseEntity, w),
-    );
+    return warehouses.map((w) => plainToInstance(WarehouseEntity, w));
   }
 
   // ===============================
@@ -62,9 +58,7 @@ export class WarehouseService {
     });
 
     if (!warehouse) {
-      throw new NotFoundException(
-        `Warehouse with ID "${id}" not found`,
-      );
+      throw new NotFoundException(`Warehouse with ID "${id}" not found`);
     }
 
     return plainToInstance(WarehouseEntity, warehouse);
@@ -73,10 +67,7 @@ export class WarehouseService {
   // ===============================
   // UPDATE
   // ===============================
-  async update(
-    id: string,
-    dto: UpdateWarehouseDto,
-  ): Promise<WarehouseEntity> {
+  async update(id: string, dto: UpdateWarehouseDto): Promise<WarehouseEntity> {
     await this.findOne(id);
 
     if (dto.name) {

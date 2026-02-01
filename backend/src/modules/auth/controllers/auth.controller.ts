@@ -26,7 +26,9 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  async signup(@Body() signupDto: SignupDto): Promise<ApiResponse<AuthResponseDto>> {
+  async signup(
+    @Body() signupDto: SignupDto,
+  ): Promise<ApiResponse<AuthResponseDto>> {
     const data = await this.authService.signup(signupDto);
     return apiResponse(data, 'User registered successfully');
   }
@@ -38,7 +40,8 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<ApiResponse<AuthResponseDto>> {
-    const { accessToken, refreshToken, user } = await this.authService.login(loginDto);
+    const { accessToken, refreshToken, user } =
+      await this.authService.login(loginDto);
 
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
@@ -58,17 +61,24 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<ApiResponse<AuthResponseDto>> {
-    const refreshToken = (req as Request & { cookies: Record<string, string> }).cookies['refresh_token'];
-    
-    console.log('Refresh request cookies:', (req as Request & { cookies: any }).cookies);
+    const refreshToken = (req as Request & { cookies: Record<string, string> })
+      .cookies['refresh_token'];
+
+    console.log(
+      'Refresh request cookies:',
+      (req as Request & { cookies: any }).cookies,
+    );
     console.log('Refresh request headers:', req.headers);
 
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token');
     }
 
-    const { accessToken, refreshToken: newRefreshToken, user } = 
-    await this.authService.refresh(refreshToken);
+    const {
+      accessToken,
+      refreshToken: newRefreshToken,
+      user,
+    } = await this.authService.refresh(refreshToken);
 
     res.cookie('refresh_token', newRefreshToken, {
       httpOnly: true,
@@ -80,12 +90,13 @@ export class AuthController {
 
     return apiResponse({ accessToken, user }, 'Token refreshed');
   }
-   
+
   @Public()
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const refreshToken = (req as Request & { cookies: Record<string, string> }).cookies['refresh_token'];
+    const refreshToken = (req as Request & { cookies: Record<string, string> })
+      .cookies['refresh_token'];
 
     if (refreshToken) {
       await this.authService.logout(refreshToken);

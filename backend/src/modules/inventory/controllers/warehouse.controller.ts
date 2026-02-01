@@ -24,9 +24,7 @@ import { Role } from '../../auth/generated/prisma';
 @Controller('inventory/warehouses')
 @UseInterceptors(ClassSerializerInterceptor)
 export class WarehouseController {
-  constructor(
-    private readonly warehouseService: WarehouseService,
-  ) {}
+  constructor(private readonly warehouseService: WarehouseService) {}
 
   @Post()
   @Roles(Role.ADMIN)

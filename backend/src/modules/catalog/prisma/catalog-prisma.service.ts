@@ -8,7 +8,6 @@ export class CatalogPrismaService
 {
   // Removed constructor with datasource override as it's now handled by the schema and generated client configuration
 
-
   async onModuleInit() {
     await this.$connect();
   }

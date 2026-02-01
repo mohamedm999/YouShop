@@ -2161,6 +2161,7 @@ export namespace Prisma {
     sku: string | null
     quantity: number | null
     unitPrice: Decimal | null
+    warehouseId: string | null
   }
 
   export type OrderItemMaxAggregateOutputType = {
@@ -2169,6 +2170,7 @@ export namespace Prisma {
     sku: string | null
     quantity: number | null
     unitPrice: Decimal | null
+    warehouseId: string | null
   }
 
   export type OrderItemCountAggregateOutputType = {
@@ -2177,6 +2179,7 @@ export namespace Prisma {
     sku: number
     quantity: number
     unitPrice: number
+    warehouseId: number
     _all: number
   }
 
@@ -2197,6 +2200,7 @@ export namespace Prisma {
     sku?: true
     quantity?: true
     unitPrice?: true
+    warehouseId?: true
   }
 
   export type OrderItemMaxAggregateInputType = {
@@ -2205,6 +2209,7 @@ export namespace Prisma {
     sku?: true
     quantity?: true
     unitPrice?: true
+    warehouseId?: true
   }
 
   export type OrderItemCountAggregateInputType = {
@@ -2213,6 +2218,7 @@ export namespace Prisma {
     sku?: true
     quantity?: true
     unitPrice?: true
+    warehouseId?: true
     _all?: true
   }
 
@@ -2308,6 +2314,7 @@ export namespace Prisma {
     sku: string
     quantity: number
     unitPrice: Decimal
+    warehouseId: string
     _count: OrderItemCountAggregateOutputType | null
     _avg: OrderItemAvgAggregateOutputType | null
     _sum: OrderItemSumAggregateOutputType | null
@@ -2335,6 +2342,7 @@ export namespace Prisma {
     sku?: boolean
     quantity?: boolean
     unitPrice?: boolean
+    warehouseId?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["orderItem"]>
 
@@ -2344,6 +2352,7 @@ export namespace Prisma {
     sku?: boolean
     quantity?: boolean
     unitPrice?: boolean
+    warehouseId?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["orderItem"]>
 
@@ -2353,6 +2362,7 @@ export namespace Prisma {
     sku?: boolean
     quantity?: boolean
     unitPrice?: boolean
+    warehouseId?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["orderItem"]>
 
@@ -2362,9 +2372,10 @@ export namespace Prisma {
     sku?: boolean
     quantity?: boolean
     unitPrice?: boolean
+    warehouseId?: boolean
   }
 
-  export type OrderItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderId" | "sku" | "quantity" | "unitPrice", ExtArgs["result"]["orderItem"]>
+  export type OrderItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderId" | "sku" | "quantity" | "unitPrice" | "warehouseId", ExtArgs["result"]["orderItem"]>
   export type OrderItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     order?: boolean | OrderDefaultArgs<ExtArgs>
   }
@@ -2386,6 +2397,7 @@ export namespace Prisma {
       sku: string
       quantity: number
       unitPrice: Prisma.Decimal
+      warehouseId: string
     }, ExtArgs["result"]["orderItem"]>
     composites: {}
   }
@@ -2815,6 +2827,7 @@ export namespace Prisma {
     readonly sku: FieldRef<"OrderItem", 'String'>
     readonly quantity: FieldRef<"OrderItem", 'Int'>
     readonly unitPrice: FieldRef<"OrderItem", 'Decimal'>
+    readonly warehouseId: FieldRef<"OrderItem", 'String'>
   }
     
 
@@ -3261,7 +3274,8 @@ export namespace Prisma {
     orderId: 'orderId',
     sku: 'sku',
     quantity: 'quantity',
-    unitPrice: 'unitPrice'
+    unitPrice: 'unitPrice',
+    warehouseId: 'warehouseId'
   };
 
   export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
@@ -3459,6 +3473,7 @@ export namespace Prisma {
     sku?: StringFilter<"OrderItem"> | string
     quantity?: IntFilter<"OrderItem"> | number
     unitPrice?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    warehouseId?: StringFilter<"OrderItem"> | string
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
   }
 
@@ -3468,6 +3483,7 @@ export namespace Prisma {
     sku?: SortOrder
     quantity?: SortOrder
     unitPrice?: SortOrder
+    warehouseId?: SortOrder
     order?: OrderOrderByWithRelationInput
   }
 
@@ -3480,6 +3496,7 @@ export namespace Prisma {
     sku?: StringFilter<"OrderItem"> | string
     quantity?: IntFilter<"OrderItem"> | number
     unitPrice?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    warehouseId?: StringFilter<"OrderItem"> | string
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
   }, "id">
 
@@ -3489,6 +3506,7 @@ export namespace Prisma {
     sku?: SortOrder
     quantity?: SortOrder
     unitPrice?: SortOrder
+    warehouseId?: SortOrder
     _count?: OrderItemCountOrderByAggregateInput
     _avg?: OrderItemAvgOrderByAggregateInput
     _max?: OrderItemMaxOrderByAggregateInput
@@ -3505,6 +3523,7 @@ export namespace Prisma {
     sku?: StringWithAggregatesFilter<"OrderItem"> | string
     quantity?: IntWithAggregatesFilter<"OrderItem"> | number
     unitPrice?: DecimalWithAggregatesFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    warehouseId?: StringWithAggregatesFilter<"OrderItem"> | string
   }
 
   export type OrderCreateInput = {
@@ -3586,6 +3605,7 @@ export namespace Prisma {
     sku: string
     quantity: number
     unitPrice: Decimal | DecimalJsLike | number | string
+    warehouseId?: string
     order: OrderCreateNestedOneWithoutItemsInput
   }
 
@@ -3595,6 +3615,7 @@ export namespace Prisma {
     sku: string
     quantity: number
     unitPrice: Decimal | DecimalJsLike | number | string
+    warehouseId?: string
   }
 
   export type OrderItemUpdateInput = {
@@ -3602,6 +3623,7 @@ export namespace Prisma {
     sku?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    warehouseId?: StringFieldUpdateOperationsInput | string
     order?: OrderUpdateOneRequiredWithoutItemsNestedInput
   }
 
@@ -3611,6 +3633,7 @@ export namespace Prisma {
     sku?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    warehouseId?: StringFieldUpdateOperationsInput | string
   }
 
   export type OrderItemCreateManyInput = {
@@ -3619,6 +3642,7 @@ export namespace Prisma {
     sku: string
     quantity: number
     unitPrice: Decimal | DecimalJsLike | number | string
+    warehouseId?: string
   }
 
   export type OrderItemUpdateManyMutationInput = {
@@ -3626,6 +3650,7 @@ export namespace Prisma {
     sku?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    warehouseId?: StringFieldUpdateOperationsInput | string
   }
 
   export type OrderItemUncheckedUpdateManyInput = {
@@ -3634,6 +3659,7 @@ export namespace Prisma {
     sku?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    warehouseId?: StringFieldUpdateOperationsInput | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -3846,6 +3872,7 @@ export namespace Prisma {
     sku?: SortOrder
     quantity?: SortOrder
     unitPrice?: SortOrder
+    warehouseId?: SortOrder
   }
 
   export type OrderItemAvgOrderByAggregateInput = {
@@ -3859,6 +3886,7 @@ export namespace Prisma {
     sku?: SortOrder
     quantity?: SortOrder
     unitPrice?: SortOrder
+    warehouseId?: SortOrder
   }
 
   export type OrderItemMinOrderByAggregateInput = {
@@ -3867,6 +3895,7 @@ export namespace Prisma {
     sku?: SortOrder
     quantity?: SortOrder
     unitPrice?: SortOrder
+    warehouseId?: SortOrder
   }
 
   export type OrderItemSumOrderByAggregateInput = {
@@ -4163,6 +4192,7 @@ export namespace Prisma {
     sku: string
     quantity: number
     unitPrice: Decimal | DecimalJsLike | number | string
+    warehouseId?: string
   }
 
   export type OrderItemUncheckedCreateWithoutOrderInput = {
@@ -4170,6 +4200,7 @@ export namespace Prisma {
     sku: string
     quantity: number
     unitPrice: Decimal | DecimalJsLike | number | string
+    warehouseId?: string
   }
 
   export type OrderItemCreateOrConnectWithoutOrderInput = {
@@ -4207,6 +4238,7 @@ export namespace Prisma {
     sku?: StringFilter<"OrderItem"> | string
     quantity?: IntFilter<"OrderItem"> | number
     unitPrice?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    warehouseId?: StringFilter<"OrderItem"> | string
   }
 
   export type OrderCreateWithoutItemsInput = {
@@ -4270,6 +4302,7 @@ export namespace Prisma {
     sku: string
     quantity: number
     unitPrice: Decimal | DecimalJsLike | number | string
+    warehouseId?: string
   }
 
   export type OrderItemUpdateWithoutOrderInput = {
@@ -4277,6 +4310,7 @@ export namespace Prisma {
     sku?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    warehouseId?: StringFieldUpdateOperationsInput | string
   }
 
   export type OrderItemUncheckedUpdateWithoutOrderInput = {
@@ -4284,6 +4318,7 @@ export namespace Prisma {
     sku?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    warehouseId?: StringFieldUpdateOperationsInput | string
   }
 
   export type OrderItemUncheckedUpdateManyWithoutOrderInput = {
@@ -4291,6 +4326,7 @@ export namespace Prisma {
     sku?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    warehouseId?: StringFieldUpdateOperationsInput | string
   }
 
 
